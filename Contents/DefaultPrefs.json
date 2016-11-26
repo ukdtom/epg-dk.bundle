@@ -1,0 +1,20 @@
+[
+	{
+		"id":"Store_Path",
+		"label":"Path to store yousee.xml file",
+		"type":"text",
+		"default": ""
+	},
+	{
+		"id":"API_Key",
+		"label":"API Key for YouSee",
+		"type":"text",
+		"default": ""
+	},
+	{
+		"id":"Days_Ahead",
+		"label":"Amount of days to fetch",
+		"type":"text",
+		"default": "7"
+	}
+]
