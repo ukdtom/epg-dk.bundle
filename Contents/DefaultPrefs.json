@@ -1,20 +1,26 @@
 [
 	{
 		"id":"Store_Path",
-		"label":"Path to store yousee.xml file",
+		"label":"Absolute path and filename of generated xmltv file",
 		"type":"text",
-		"default": ""
+		"default": "/somedir/somefile.xml   or C:\Somedir\Somefile.xml"
 	},
 	{
 		"id":"API_Key",
-		"label":"API Key for YouSee",
+		"label":"API Key for YouSee: HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn",
 		"type":"text",
 		"default": ""
 	},
 	{
-		"id":"Days_Ahead",
-		"label":"Amount of days to fetch",
+		"id":"EnableSchedule",
+		"label":"Enable Scheduler",
+		"type":"bool",
+		"default": "True"
+	},
+	{
+		"id":"Schedule",
+		"label":"What time to schedule an automaticly update the xmltv file",
 		"type":"text",
-		"default": "7"
+		"default": "01:00"
 	}
 ]
