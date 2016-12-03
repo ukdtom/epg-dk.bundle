@@ -1,5 +1,5 @@
 ####################################################################################################
-#	This plugin will download a program guide from YouSee
+#	This plugin will download a danish program guide from YouSee
 #
 #	Made by 
 #	dane22....A Plex Community member
@@ -15,10 +15,12 @@ import time
 import threading
 from threading import Timer
 from datetime import datetime
+import xml.dom.minidom
+import re
 
 
 # Consts used
-VERSION = ' V0.0.0.1'
+VERSION = ' V0.0.0.2'
 NAME = 'DVR-YouSee'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -27,13 +29,15 @@ PREFIX = '/applications/DVR-YouSee'
 APPGUID = '76a8cf36-7c2b-11e4-8b4d-00079bd310b2'
 BASEURL = 'http://api.yousee.tv/rest/tvguide/'
 HEADER = {'X-API-KEY' : Prefs['API_Key']}
-PROGRAMSTOGRAB = '5'
+PROGRAMSTOGRAB = '10'
 bFirstRun = False
+DEBUGMODE = False
 
 ####################################################################################################
 # Start function
 ####################################################################################################
 def Start():
+	global DEBUGMODE
 	# Switch to debug mode if needed
 	debugFile = Core.storage.join_path(Core.app_support_path, Core.config.bundles_dir_name, NAME + '.bundle', 'debug')
 	DEBUGMODE = os.path.isfile(debugFile)
@@ -75,6 +79,7 @@ def MainMenu():
 ####################################################################################################
 # ValidatePrefs
 ####################################################################################################
+#TODO This hangs on some platforms sadly..Need to spawn a thread instead I think
 @route(PREFIX + '/ValidatePrefs')
 def ValidatePrefs():
 	# Restart plugin after changing prefs
@@ -120,21 +125,24 @@ def doCreateXMLFile(menuCall = False):
 	root.set('date', datetime.now().strftime('%Y%m%d%H%M%S'))
 	root.set('source-info-name','YouSee')
 	root.set('Author','dane22, a Plex Community member')
+	root.set('Sourcecode', 'https://github.com/ukdtom/dvr-yousee.bundle')
 	root.set('Credits', 'Tommy Winther: https://github.com/twinther/script.tvguide')
 	Channels = getChannelsList()
 	for Channel in Channels:
 		channel = ET.SubElement(root, 'channel', id=str(Channel['id']))
-		ET.SubElement(channel, 'display-name').text = Channel['name']
+		ET.SubElement(channel, 'display-name').text = ValidateXMLStr(Channel['name'])
 		ET.SubElement(channel, 'icon', src=Channel['logo'])
+	# Just a brief check to make sure, that bFirstRun is stamped correctly
+	getChannelsEnabled()
 	if not bFirstRun:
 		Programs = getChannelInfo()
 		for Program in Programs:
 			startTime = datetime.fromtimestamp(Program['begin']).strftime('%Y%m%d%H%M%S +0100')
 			stopTime = datetime.fromtimestamp(Program['end']).strftime('%Y%m%d%H%M%S +0100')
-			poster = Program['imageprefix'] + Program['images_fourbythree']['small']
+			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']))
-			ET.SubElement(program, 'title', lang='da').text = Program['title']
-			ET.SubElement(program, 'desc', lang='da').text = Program['description']
+			ET.SubElement(program, 'title', lang='da').text = ValidateXMLStr(Program['title'])
+			ET.SubElement(program, 'desc', lang='da').text = ValidateXMLStr(Program['description'])
 			ET.SubElement(program, 'icon', src=poster)
 			#Episode info
 			try:
@@ -157,7 +165,12 @@ def doCreateXMLFile(menuCall = False):
 				Log.Exception('Exception when digesting %s with the error %s' %(Program['title'], e))
 				continue
 			# Category
+			Program['category_string'] = ValidateXMLStr(Program['category_string'])
 			ET.SubElement(program, 'category', lang='da').text = Program['category_string']
+			if Program['category_string'] == 'Nyheder':
+				ET.SubElement(program, 'category', lang='en').text = 'news'
+			if Program['category_string'] == 'Sport':
+				ET.SubElement(program, 'category', lang='en').text = 'sports'
 	tree = ET.ElementTree(root)
 	xmlstr = unicode(ET.tostring(tree.getroot(), xml_declaration=True, encoding="utf-8", pretty_print=True, doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))	
 	with io.open(xmlFile, "w", encoding="utf-8") as f:
@@ -195,7 +208,6 @@ def getChannelInfo():
 	# Get a list of channels to download from
 	ChannelsEnabled = getChannelsEnabled()
 	if bFirstRun:
-		print 'Ged First run, so eject now'
 		return
 	programPartURL = '/offset/0/format/json/apiversion/2/fields/id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string/startIndex/'
 	Log.Debug('Enabled channels to fetch: ' + str(ChannelsEnabled))
@@ -212,7 +224,7 @@ def getChannelInfo():
 			URL = url + 'channel_id/' + str(id) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB
 			Info = JSON.ObjectFromURL(URL, headers=HEADER)
 			Programs = Info['programs']
-			for Program in Programs:
+			for Program in Programs:			
 				result.append(Program)
 			count += int(PROGRAMSTOGRAB)
 			if count > total:
@@ -232,7 +244,7 @@ def getChannelsEnabled():
 	# Start by getting enabled channels
 	url = 'http://127.0.0.1:32400/livetv/dvrs'
 	urlYouSee = BASEURL + 'channels/format/json/fields/id'
-	enableList = XML.ObjectFromURL(url)
+	enableList = XML.ObjectFromURL(url, cacheTime=0)
 	# First run or not
 	if int(enableList.get('size')) == 0:
 		Log.Debug(NAME + ' is running for the first time, so grap all channels')
@@ -246,6 +258,7 @@ def getChannelsEnabled():
 					identifiers.append(channel['id'])
 	else:
 		Log.Debug(NAME + ' is already enabled, so grap the enabled channels')
+		bFirstRun = False
 		enabled = enableList.xpath('//ChannelMapping')
 		for channel in enabled:
 			if channel.get('enabled') == '1':
@@ -274,4 +287,18 @@ def scheduler():
 	else:
 		Log.Debug('Scheduler disabled')
 
+####################################################################################################
+# Validate XML String
+####################################################################################################
+@route(PREFIX + '/ValidateXMLStr')
+def ValidateXMLStr(xmlstr):
+	# Replace valid utf-8 characters, that doesn't work in an xml file with a questionmark
+	RE_XML_ILLEGAL = u'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' + \
+                 u'|' + \
+                 u'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' % \
+                  (unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                   unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                   unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff))
+	xmlstr = re.sub(RE_XML_ILLEGAL, "?", xmlstr)
+	return xmlstr
 
