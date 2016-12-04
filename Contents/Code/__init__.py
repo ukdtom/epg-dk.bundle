@@ -8,27 +8,20 @@
 
 # Imports
 import io, os
-import json
 from lxml import etree as ET
 from datetime import datetime
-import time
-import threading
-from threading import Timer
-from datetime import datetime
-import xml.dom.minidom
 import re
-
 
 # Consts used
 VERSION = ' V0.0.0.2'
-NAME = 'DVR-YouSee'
+NAME = 'dvr-yousee'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
 ICON = 'youSee.png'
-PREFIX = '/applications/DVR-YouSee'
+PREFIX = '/applications/dvr-yousee'
 APPGUID = '76a8cf36-7c2b-11e4-8b4d-00079bd310b2'
 BASEURL = 'http://api.yousee.tv/rest/tvguide/'
-HEADER = {'X-API-KEY' : Prefs['API_Key']}
+HEADER = {'X-API-KEY' : 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
 PROGRAMSTOGRAB = '10'
 bFirstRun = False
 DEBUGMODE = False
@@ -65,26 +58,18 @@ def MainMenu():
 	ObjectContainer.title1 = NAME  + VERSION
 	oc = ObjectContainer()
 	oc.view_group = 'List'
-	oc.add(DirectoryObject(key=Callback(createXMLFile, menuCall=True), title='Force create XML File', summary='Create XML File'))
+	oc.add(DirectoryObject(key=Callback(createXMLFile, menuCall=True), title='Force create XML File', summary='Force create XML File'))
 #	oc.add(DirectoryObject(key=Callback(refreshEPG, menuCall=True), title='Refresh EPG', summary='Refresh EPG'))
 	oc.add(PrefsObject(title='Preferences', thumb=R(ICON)))
 	Log.Debug("**********  Ending MainMenu  **********")
 	return oc
 
 ####################################################################################################
-# Init Internal storage
-####################################################################################################
-#TODO: Do we need this?
-
-####################################################################################################
 # ValidatePrefs
 ####################################################################################################
-#TODO This hangs on some platforms sadly..Need to spawn a thread instead I think
 @route(PREFIX + '/ValidatePrefs')
 def ValidatePrefs():
-	# Restart plugin after changing prefs
-
-	HTTP.Request('http://127.0.0.1:32400/:/plugins/com.plexapp.plugins.dvr-yousee.bundle/restart', immediate=True, cacheTime=0)
+	scheduler()
 
 ####################################################################################################
 # Refresh EPG			*** Not used ***
@@ -105,13 +90,13 @@ def refreshEPG(menuCall = False):
 		return
 
 ####################################################################################################
-# Create XMLTV File
+# Create XMLTV File Thread
 ####################################################################################################
 @route(PREFIX + '/createXMLFile')
 def createXMLFile(menuCall = False):
-	message = 'All done'
+	message = 'XML Generation started'
 	oc = ObjectContainer(title1='Create XML File', no_cache=True, message=message)
-	doCreateXMLFile(menuCall = menuCall)
+	Thread.CreateTimer(1, doCreateXMLFile, menuCall = menuCall)
 	return oc
 
 ####################################################################################################
@@ -166,11 +151,29 @@ def doCreateXMLFile(menuCall = False):
 				continue
 			# Category
 			Program['category_string'] = ValidateXMLStr(Program['category_string'])
-			ET.SubElement(program, 'category', lang='da').text = Program['category_string']
+			ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['category_string'])
 			if Program['category_string'] == 'Nyheder':
 				ET.SubElement(program, 'category', lang='en').text = 'news'
 			if Program['category_string'] == 'Sport':
 				ET.SubElement(program, 'category', lang='en').text = 'sports'
+			if ValidateXMLStr(Program['subcategory_string']) != ValidateXMLStr(Program['category_string']):
+				ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['subcategory_string'])
+			#Credits
+			credits = ET.SubElement(program, 'credits', lang='da')
+			# Directors if present
+			Director_list = ValidateXMLStr(Program['directors'])
+			if len(Director_list) > 0:
+				Director_list = Director_list.split(",")
+				for director in Director_list:
+					if director.startswith(" "): director = director[1:]
+					ET.SubElement(credits, 'director', lang='da').text = director
+			#	actor if present
+			Actor_list = ValidateXMLStr(Program['cast'])
+			if len(Actor_list) > 0:
+				Actor_list = Actor_list.split(",")
+				for actor in Actor_list:
+					if actor.startswith(" "): actor = actor[1:]
+					ET.SubElement(credits, 'actor', lang='da').text = actor
 	tree = ET.ElementTree(root)
 	xmlstr = unicode(ET.tostring(tree.getroot(), xml_declaration=True, encoding="utf-8", pretty_print=True, doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))	
 	with io.open(xmlFile, "w", encoding="utf-8") as f:
@@ -209,7 +212,7 @@ def getChannelInfo():
 	ChannelsEnabled = getChannelsEnabled()
 	if bFirstRun:
 		return
-	programPartURL = '/offset/0/format/json/apiversion/2/fields/id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string/startIndex/'
+	programPartURL = '/offset/0/format/json/apiversion/2/fields/id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string,subcategory_string,directors,cast/startIndex/'
 	Log.Debug('Enabled channels to fetch: ' + str(ChannelsEnabled))
 	result = []
 	for id in ChannelsEnabled:
@@ -221,7 +224,7 @@ def getChannelInfo():
 		Log.Debug('Total amount to fetch for channel %s is %s' %(str(id), total))
 		# Now grab program info in small chuncks
 		while True:
-			URL = url + 'channel_id/' + str(id) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB
+			URL = url + 'channel_id/' + str(id) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB			
 			Info = JSON.ObjectFromURL(URL, headers=HEADER)
 			Programs = Info['programs']
 			for Program in Programs:			
@@ -266,7 +269,7 @@ def getChannelsEnabled():
 	return identifiers
 
 ####################################################################################################
-# Get Scheduler
+# Scheduler
 ####################################################################################################
 @route(PREFIX + '/scheduler')
 def scheduler():
@@ -280,10 +283,10 @@ def scheduler():
 		if deltaTimeInSec < 0:
 			# Darn, we missed it, so adding 24 hours here
 			deltaTimeInSec += 86400
-		Log.Debug('Time is now: ' + runTime.strftime(FMT))
-		Log.Debug('We should autorun at: ' + nowTime.strftime(FMT))
+		Log.Debug('We should autorun at: ' + runTime.strftime(FMT))
+		Log.Debug('Time is now: ' + nowTime.strftime(FMT))
 		Log.Debug('Amount of seconds to next run is: ' + str(deltaTimeInSec))
-		threading.Timer(deltaTimeInSec, doCreateXMLFile).start()
+		Thread.CreateTimer(deltaTimeInSec, doCreateXMLFile)
 	else:
 		Log.Debug('Scheduler disabled')
 

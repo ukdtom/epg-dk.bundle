@@ -3,13 +3,7 @@
 		"id":"Store_Path",
 		"label":"Absolute path and filename of generated xmltv file",
 		"type":"text",
-		"default": "/somedir/somefile.xml   or C:\Somedir\Somefile.xml"
-	},
-	{
-		"id":"API_Key",
-		"label":"API Key for YouSee: HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn - qUkcfVVjosq3910c6LSN6pBg0O2XTyjz8kiwUc3L",
-		"type":"text",
-		"default": ""
+		"default": "/somedir/somefile.xml   or C:\\Somedir\\Somefile.xml"
 	},
 	{
 		"id":"EnableSchedule",
@@ -19,7 +13,7 @@
 	},
 	{
 		"id":"Schedule",
-		"label":"What time to schedule an automaticly update the xmltv file",
+		"label":"What time to schedule an automaticly update the xmltv file in the format HH:MM",
 		"type":"text",
 		"default": "01:00"
 	}
