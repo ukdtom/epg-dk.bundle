@@ -6,7 +6,7 @@ epg-dk.bundle
 
 ![logo](https://github.com/ukdtom/epg-dk.bundle/blob/master/Contents/Resources/epg-dk.png)
 
-Please see the wiki for futher information
+Please see the wiki for further information
 
 https://github.com/ukdtom/epg-dk.bundle/wiki
 
