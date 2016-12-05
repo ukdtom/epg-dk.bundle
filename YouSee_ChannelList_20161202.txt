@@ -1,0 +1,235 @@
+YouSee Channel list 20161202
+
+1 DR1 
+2 DR2
+3 TV 2 
+4 TV 2 Zulu 
+5 TV 2 Charlie 
+7 TV3 
+8 TV3+ 
+9 Kanal 4 
+10 Kanal 5 
+11 Infokanalen 
+12 TV3 Puls 
+13 DK4 
+14 YouSee Trailerkanal 
+15 Kanal 5 HD 
+16 DR3 
+17 6'eren 
+18 Nickelodeon 
+19 Disney Channel 
+20 Cartoon Network 
+21 Disney XD 
+22 TCM 
+23 NatGeo Wild HD 
+24 Eurosport 
+25 TV3 SPORT 1 
+26 TV3 SPORT 2 
+27 EuroSport HD 
+28 Animal Planet HD 
+29 MTV Live HD 
+30 Discovery Channel 
+31 Animal Planet 
+32 National Geographic 
+33 DR1 Syn 
+34 DR2 Syn 
+35 DR3 Syn 
+37 VH1 
+38 TV 2 News 
+39 Discovery HD Showcase 
+40 BBC Brit 
+41 BBC World 
+42 CNN 
+43 BBC HD 
+44 TV4 
+45 Sverige 1 
+46 Sverige 2 
+47 NRK2 
+48 NRK1 
+49 TV2 Norge 
+50 24Nordjyske 
+51 ARD 
+52 ZDF 
+53 NDR 
+54 RTL 
+55 Sat1 
+56 Pro7 
+57 VOX 
+58 TV 2 
+59 TLC Danmark 
+60 TNT 
+61 TLC HD Danmark 
+62 TNT 
+63 Nickelodeon HD 
+64 6´eren HD 
+65 Lokalt program 
+66 Lokalt program 
+67 Kanal Sport 
+68 Prøvekanal 
+69 ZDF HD 
+70 DR Ultra 
+71 OutDoor HD 
+72 TV 2 Fri HD 
+73 Euronews 
+75 Ekstrakanalen 
+76 Event HD 
+77 CANAL+ First 
+79 TV 2 SPORT HD 
+80 Comedy Central HD 
+81 Nat Geo People HD 
+83 TV 2 Danmark HD 
+84 History HD 
+85 Canal 8 Sport 
+89 Sverige 1 HD 
+90 Showtime 
+91 BBC Earth 
+92 BBC Lifestyle 
+93 Nick Jr. 
+94 CNBC 
+95 Viasat Nature Crime 
+98 CANAL8 Sport 
+99 CANAL9 
+100 Discovery World 
+101 Discovery Science 
+102 Discovery Travel Living 
+103 Eurosport 360 1 
+104 Eurosport 360 2 
+105 Eurosport 360 3 
+106 Eurosport 360 4 
+107 Eurosport 360 5 
+108 Eurosport 360 6 
+109 Eurosport 360 7 
+110 MTV Rocks 
+111 MTV Dance 
+112 MTV Hits 
+113 VH1 Classic 
+116 CBS Reality 
+117 Travel Channel 
+118 Star! 
+119 Dantoto Live 
+120 Nat Geo Wild 
+122 Motors TV 
+123 MTV 
+124 Disney Channel HD 
+125 Arte 
+126 Mezzo 
+127 Kanal Sport HD 
+128 TV 5 
+130 Viasat History 
+131 Viasat Explore 
+132 H2 
+133 Eurosport Danmark 
+134 Viasat Hits 
+135 Viasat Series 
+136 Viasat Film Premiere 
+138 Viasat Golf 
+139 ESPN Classic Europe 
+140 Eurosport 2 
+141 ESPN America 
+142 Viasat Comedy 
+143 Bloomberg 
+145 TV3 Sport 1 HD 
+146 Canal 9 HD 
+149 Investigation Discovery 
+150 C More Emotion 
+151 C More Golf 
+152 C More Tennis 
+154 C More First 
+155 C More First 
+156 C More Hits 
+157 C More Kids 
+158 C More Series 
+159 C MORE Star 
+160 Folketinget 
+161 C More Hits HD 
+162 Boomerang 
+170 Toon Disney 
+172 TV3+ HD 
+173 EuroSport 2 HD 
+174 Disney Junior 
+175 Silver HD 
+177 TV1000 Drama 
+180 Viasat Film Action 
+181 Viasat Fim Classic 
+182 Viasat Film Drama 
+183 Viasat Film Family 
+184 Viasat Film 
+185 Nordic 
+187 Al Jazeera English 
+195 3Sat 
+200 France 2 
+202 RaiUno 
+204 TVE 
+210 TV Pol 
+211 Polsa2 
+215 RTK 1 
+216 Hayat TV 
+217 BHT 1 
+218 HRT1 
+219 Pink+ 
+220 RTSsat 
+221 RTCG 
+222 Netflix 
+225 Mezopotamya TV 
+226 Roj TV 
+230 TRT 
+231 Euro Star 
+232 Kanal7 
+233 Euro D 
+234 TGRT EU 
+235 Lig TV 
+236 ShowTV 
+237 Trkmax 
+238 STV 
+239 ATV 
+240 Kral TV 
+250 MBC 
+251 Al Jazeera 
+252 EDTV 
+253 Al Masriyah 
+254 Al Aoula 
+255 Art Movies 
+256 Al Spo 
+257 Iqraa 
+258 Abu Dhabi TV 
+270 Sony MAX 
+271 SET 
+272 AAG 
+273 Geo TV 
+274 Star Go 
+275 Star PI 
+276 CCTV 4 
+277 Sony MAX 
+278 Geo News 
+280 Thai TV Global Netwo 
+311 TV2 Nord 
+312 TV Mid 
+313 TV2 OJ 
+314 TV Syd 
+315 TV Fyn 
+316 TV2 Østsjælland 
+317 Lorry 
+318 TV2Bor 
+323 TV2 Østjylland 
+324 TV2 Syd 
+325 TV2 Fyn 
+326 TV2 Bornholm 
+327 TV2 M 
+328 TV2 N 
+329 TV2 Ø 
+366 HUSTLER tv 
+367 Blue Hustler 
+368 Playboy TV 
+400 Hjørring Infokanal 
+411 Kanalen Nord 
+412 Kanalen Midt-Vest 
+413 Kanal Østjylland 
+414 Kanal Syd 
+415 Fynbo TV 
+416 Kanalen Øst 
+417 Kanal Hovedstaden 
+418 Kanalen Bornholm 
+503 DR HD 
+504 DR K 
+505 DR Ramasjang 
+889 DR Update

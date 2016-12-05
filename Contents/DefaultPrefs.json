@@ -1,0 +1,26 @@
+[
+	{
+		"id":"Store_Path",
+		"label":"Absolute path and filename of generated xmltv file",
+		"type":"text",
+		"default": "/somedir/somefile.xml   or C:\\Somedir\\Somefile.xml"
+	},
+	{
+		"id":"DaysToFetch",
+		"label":"Amount of days to fetch. This number most be in the range of 1 to 7",
+		"type":"text",
+		"default": "3"
+	},
+	{
+		"id":"EnableSchedule",
+		"label":"Enable Scheduler",
+		"type":"bool",
+		"default": "True"
+	},
+	{
+		"id":"Schedule",
+		"label":"What time to schedule an automaticly update the xmltv file in the format HH:MM",
+		"type":"text",
+		"default": "01:00"
+	}
+]
