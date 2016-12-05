@@ -1,5 +1,5 @@
 ####################################################################################################
-#	This plugin will download a danish program guide from YouSee
+#	This plugin will downloads a danish program guide from YouSee
 #
 #	Made by 
 #	dane22....A Plex Community member
@@ -13,13 +13,13 @@ from datetime import datetime
 import re
 
 # Consts used
-VERSION = ' V0.0.0.3'
-NAME = 'dvr-yousee'
+VERSION = ' V0.0.0.4'
+NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
-ICON = 'youSee.png'
-PREFIX = '/applications/dvr-yousee'
-APPGUID = '76a8cf36-7c2b-11e4-8b4d-00079bd310b2'
+ICON = 'epg-dk.png'
+PREFIX = '/applications/epg-dk'
+APPGUID = '76a8cf36-7c2b-11e4-8b4d-00079cdf80b2'
 BASEURL = 'http://api.yousee.tv/rest/tvguide/'
 HEADER = {'X-API-KEY' : 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
 PROGRAMSTOGRAB = '10'
@@ -177,7 +177,6 @@ def doCreateXMLFile(menuCall = False):
 					ET.SubElement(credits, 'actor', lang='da').text = actor
 			# Video details....Here we lie, but should be correct in about 90% of the times
 			video = ET.SubElement(program, 'video', lang='en')
-#			ET.SubElement(video, 'aspect', lang='en').text = '16:9'
 			ET.SubElement(video, 'quality', lang='en').text = 'HDTV'
 	tree = ET.ElementTree(root)
 	xmlstr = unicode(ET.tostring(tree.getroot(), xml_declaration=True, encoding="utf-8", pretty_print=True, doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))	
@@ -247,7 +246,7 @@ def getChannelInfo():
 	return result
 
 ####################################################################################################
-# Get Channels enabled from YouSee
+# Get Channels enabled from DVR
 ####################################################################################################
 @route(PREFIX + '/getChannelsEnabled')
 def getChannelsEnabled():
