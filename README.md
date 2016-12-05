@@ -1,16 +1,17 @@
-DVR-YouSee.bundle
+epg-dk.bundle
 ===============
-[![GitHub issues](https://img.shields.io/github/issues/ukdtom/dvr-yousee.bundle.svg?style=flat)](https://github.com/ukdtom/dvr-yousee.bundle/issues) [![](https://img.shields.io/github/release/ukdtom/dvr-yousee.bundle.svg?style=flat)](https://github.com/ukdtom/dvr-yousee.bundle/releases) [![Download of latest release](https://img.shields.io/github/downloads/ukdtom/dvr-yousee.bundle/latest/total.svg?style=flat)](https://github.com/ukdtom/dvr-yousee.bundle/releases/latest)
+[![GitHub issues](https://img.shields.io/github/issues/ukdtom/epg-dk.bundle.svg?style=flat)](https://github.com/ukdtom/epg-dk.bundle/issues) [![](https://img.shields.io/github/release/ukdtom/epg-dk.bundle.svg?style=flat)](https://github.com/ukdtom/epg-dk.bundle/releases) [![Download of latest release](https://img.shields.io/github/downloads/ukdtom/epg-dk.bundle/latest/total.svg?style=flat)](https://github.com/ukdtom/epg-dk.bundle/releases/latest)
 [![master](https://img.shields.io/badge/master-stable-green.svg?maxAge=2592000)]()
 [![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)]()
 
+![logo](https://github.com/ukdtom/epg-dk.bundle/blob/master/Contents/Resources/epg-dk.png)
 
 Please see the wiki for futher information
 
-https://github.com/ukdtom/dvr-yousee.bundle/wiki
+https://github.com/ukdtom/epg-dk.bundle/wiki
 
 To download, go here:
-https://github.com/ukdtom/dvr-yousee.bundle/releases/latest
+https://github.com/ukdtom/epg-dk.bundle/releases/latest
 
 Known issues:
 
