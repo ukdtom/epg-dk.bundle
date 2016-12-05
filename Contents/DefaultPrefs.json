@@ -6,6 +6,12 @@
 		"default": "/somedir/somefile.xml   or C:\\Somedir\\Somefile.xml"
 	},
 	{
+		"id":"DaysToFetch",
+		"label":"Amount of days to fetch. This number most be in the range of 1 to 7",
+		"type":"text",
+		"default": "3"
+	},
+	{
 		"id":"EnableSchedule",
 		"label":"Enable Scheduler",
 		"type":"bool",

@@ -11,3 +11,9 @@ https://github.com/ukdtom/dvr-yousee.bundle/wiki
 
 To download, go here:
 https://github.com/ukdtom/dvr-yousee.bundle/releases/latest
+
+Known issues:
+
+1. Sadly, YouSee doesn't always provide the correct thumbs, but instead a dummy. I have no way of detecting this, so simply dhow the dummy instead
+2. Series/Episode numbereing is a mess, and lots of times missing from YouSee. If I detect an episode, and numbering is missing, I add a dummy of S01E01
+

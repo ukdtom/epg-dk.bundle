@@ -13,7 +13,7 @@ from datetime import datetime
 import re
 
 # Consts used
-VERSION = ' V0.0.0.2'
+VERSION = ' V0.0.0.3'
 NAME = 'dvr-yousee'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -25,6 +25,7 @@ HEADER = {'X-API-KEY' : 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
 PROGRAMSTOGRAB = '10'
 bFirstRun = False
 DEBUGMODE = False
+FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string,subcategory_string,directors,cast/startIndex'
 
 ####################################################################################################
 # Start function
@@ -174,6 +175,10 @@ def doCreateXMLFile(menuCall = False):
 				for actor in Actor_list:
 					if actor.startswith(" "): actor = actor[1:]
 					ET.SubElement(credits, 'actor', lang='da').text = actor
+			# Video details....Here we lie, but should be correct in about 90% of the times
+			video = ET.SubElement(program, 'video', lang='en')
+#			ET.SubElement(video, 'aspect', lang='en').text = '16:9'
+			ET.SubElement(video, 'quality', lang='en').text = 'HDTV'
 	tree = ET.ElementTree(root)
 	xmlstr = unicode(ET.tostring(tree.getroot(), xml_declaration=True, encoding="utf-8", pretty_print=True, doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))	
 	with io.open(xmlFile, "w", encoding="utf-8") as f:
@@ -212,25 +217,30 @@ def getChannelInfo():
 	ChannelsEnabled = getChannelsEnabled()
 	if bFirstRun:
 		return
-	programPartURL = '/offset/0/format/json/apiversion/2/fields/id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string,subcategory_string,directors,cast/startIndex/'
+	programPartURL = '/format/json/apiversion/2/fields/' + FIELDS + '/'
 	Log.Debug('Enabled channels to fetch: ' + str(ChannelsEnabled))
 	result = []
-	for id in ChannelsEnabled:
-		count = 0
-		# Get amount of items
-		URL = url + 'channel_id/' + str(id) + '/offset/0/format/json/apiversion/2/fields/totalprograms'
-		totaljson = JSON.ObjectFromURL(URL, headers=HEADER)
-		total = totaljson.get('totalprograms')
-		Log.Debug('Total amount to fetch for channel %s is %s' %(str(id), total))
-		# Now grab program info in small chuncks
-		while True:
-			URL = url + 'channel_id/' + str(id) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB			
-			Info = JSON.ObjectFromURL(URL, headers=HEADER)
-			Programs = Info['programs']
-			for Program in Programs:			
-				result.append(Program)
-			count += int(PROGRAMSTOGRAB)
-			if count > total:
+	for id in ChannelsEnabled:		
+		offsetTime = -1
+		while True:			
+			# Get amount of items
+			URL = url + 'channel_id/' + str(id) + '/offset/' + str(offsetTime) + '/format/json/apiversion/2/fields/totalprograms'
+			totaljson = JSON.ObjectFromURL(URL, headers=HEADER)
+			total = totaljson.get('totalprograms')
+			Log.Debug('Total amount to fetch for channel %s is %s' %(str(id), total))
+			# Now grab program info in small chuncks
+			count = 0
+			while True:
+				URL = url + 'channel_id/' + str(id) + '/offset/' + str(offsetTime) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB			
+				Info = JSON.ObjectFromURL(URL, headers=HEADER)
+				Programs = Info['programs']
+				for Program in Programs:			
+					result.append(Program)
+				count += int(PROGRAMSTOGRAB)
+				if count > total:
+					break
+			offsetTime += 1
+			if offsetTime > int(Prefs['DaysToFetch']):
 				break
 	Log.Debug('Returning %s programs' %(str(len(result))))
 	Log.Debug('*** Ending fetch of Program Info ***')
