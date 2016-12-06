@@ -13,7 +13,7 @@ from datetime import datetime
 import re
 
 # Consts used
-VERSION = ' V0.0.0.4'
+VERSION = ' V0.0.0.5'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -111,7 +111,7 @@ def doCreateXMLFile(menuCall = False):
 	root.set('date', datetime.now().strftime('%Y%m%d%H%M%S'))
 	root.set('source-info-name','YouSee')
 	root.set('Author','dane22, a Plex Community member')
-	root.set('Sourcecode', 'https://github.com/ukdtom/dvr-yousee.bundle')
+	root.set('Sourcecode', 'https://github.com/ukdtom/epg-dk.bundle')
 	root.set('Credits', 'Tommy Winther: https://github.com/twinther/script.tvguide')
 	Channels = getChannelsList()
 	for Channel in Channels:
