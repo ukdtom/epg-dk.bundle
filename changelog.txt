@@ -1,3 +1,9 @@
+v0.0.0.5:
+	- Fixed:
+		- #7 xmltv header
+		- #8 Wrong Actor info
+		- #9 Cast in a strange way
+
 v0.0.0.4:
 	- New:
 		- Changed name to epg-dk, to avoid any copyright issue
