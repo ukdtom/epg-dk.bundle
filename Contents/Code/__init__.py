@@ -130,6 +130,15 @@ def doCreateXMLFile(menuCall = False):
 			ET.SubElement(program, 'title', lang='da').text = ValidateXMLStr(Program['title'])
 			ET.SubElement(program, 'desc', lang='da').text = ValidateXMLStr(Program['description'])
 			ET.SubElement(program, 'icon', src=poster)
+			# Category
+			Program['category_string'] = ValidateXMLStr(Program['category_string'])
+			ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['category_string'])
+			if Program['category_string'] == 'Nyheder':
+				ET.SubElement(program, 'category', lang='en').text = 'news'
+			if Program['category_string'] == 'Sport':
+				ET.SubElement(program, 'category', lang='en').text = 'sports'
+			if ValidateXMLStr(Program['subcategory_string']) != ValidateXMLStr(Program['category_string']):
+				ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['subcategory_string'])
 			#Episode info
 			try:
 				if Program['is_series']:
@@ -150,15 +159,6 @@ def doCreateXMLFile(menuCall = False):
 			except Exception, e:
 				Log.Exception('Exception when digesting %s with the error %s' %(Program['title'], e))
 				continue
-			# Category
-			Program['category_string'] = ValidateXMLStr(Program['category_string'])
-			ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['category_string'])
-			if Program['category_string'] == 'Nyheder':
-				ET.SubElement(program, 'category', lang='en').text = 'news'
-			if Program['category_string'] == 'Sport':
-				ET.SubElement(program, 'category', lang='en').text = 'sports'
-			if ValidateXMLStr(Program['subcategory_string']) != ValidateXMLStr(Program['category_string']):
-				ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['subcategory_string'])
 			#Credits
 			credits = ET.SubElement(program, 'credits', lang='da')
 			# Directors if present
@@ -173,6 +173,12 @@ def doCreateXMLFile(menuCall = False):
 			if len(Actor_list) > 0:
 				Actor_list = Actor_list.split(",")
 				for actor in Actor_list:
+					# Replace strange :|apostrofe|;
+					actor = actor.replace(":|apostrofe|;", "'")
+					# Some times YouSee has "Character: Actor) syntax, so let's get rid of the character
+					if actor.rfind(':') > -1:
+						actor = actor[actor.rfind(':') + 1:]
+					# Skip leading space
 					if actor.startswith(" "): actor = actor[1:]
 					ET.SubElement(credits, 'actor', lang='da').text = actor
 			# Video details....Here we lie, but should be correct in about 90% of the times
