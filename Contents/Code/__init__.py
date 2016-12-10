@@ -13,7 +13,7 @@ from datetime import datetime
 import re
 
 # Consts used
-VERSION = ' V0.0.0.5'
+VERSION = ' V0.0.0.6'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -173,14 +173,18 @@ def doCreateXMLFile(menuCall = False):
 			if len(Actor_list) > 0:
 				Actor_list = Actor_list.split(",")
 				for actor in Actor_list:
+					role = ''
 					# Replace strange :|apostrofe|;
 					actor = actor.replace(":|apostrofe|;", "'")
-					# Some times YouSee has "Character: Actor) syntax, so let's get rid of the character
+					# Some times YouSee has "Character: Actor syntax, so let's split them up
 					if actor.rfind(':') > -1:
-						actor = actor[actor.rfind(':') + 1:]
+						role, actor = actor.split(':')
 					# Skip leading space
 					if actor.startswith(" "): actor = actor[1:]
-					ET.SubElement(credits, 'actor', lang='da').text = actor
+					if role != '':
+						ET.SubElement(credits, 'actor', role=role, lang='da').text = actor
+					else:
+						ET.SubElement(credits, 'actor', lang='da').text = actor
 			# Video details....Here we lie, but should be correct in about 90% of the times
 			video = ET.SubElement(program, 'video', lang='en')
 			ET.SubElement(video, 'quality', lang='en').text = 'HDTV'
