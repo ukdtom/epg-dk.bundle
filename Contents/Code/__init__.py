@@ -9,8 +9,9 @@
 # Imports
 import io, os
 from lxml import etree as ET
-from datetime import datetime
 import re
+import pytz
+from datetime import datetime, timedelta
 
 # Consts used
 VERSION = ' V0.0.0.6'
@@ -32,6 +33,7 @@ FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,
 ####################################################################################################
 def Start():
 	global DEBUGMODE
+	global OFFSET
 	# Switch to debug mode if needed
 	debugFile = Core.storage.join_path(Core.app_support_path, Core.config.bundles_dir_name, NAME + '.bundle', 'debug')
 	DEBUGMODE = os.path.isfile(debugFile)
@@ -40,6 +42,7 @@ def Start():
 		Log.Debug("*******  Started %s on %s  *********** DEBUG MODE ********" %(NAME  + VERSION, Platform.OS))
 	else:
 		Log.Debug("*******  Started %s on %s  ***********" %(NAME  + VERSION, Platform.OS))
+	OFFSET = getOffSet()
 	Plugin.AddViewGroup('List', viewMode='List', mediaType='items')
 	Plugin.AddViewGroup("Details", viewMode="InfoList", mediaType="items")
 	ObjectContainer.art = R(ART)
@@ -122,9 +125,9 @@ def doCreateXMLFile(menuCall = False):
 	getChannelsEnabled()
 	if not bFirstRun:
 		Programs = getChannelInfo()
-		for Program in Programs:
-			startTime = datetime.fromtimestamp(Program['begin']).strftime('%Y%m%d%H%M%S +0100')
-			stopTime = datetime.fromtimestamp(Program['end']).strftime('%Y%m%d%H%M%S +0100')
+		for Program in Programs:			
+			startTime = datetime.utcfromtimestamp(Program['begin']).strftime('%Y%m%d%H%M%S ' + OFFSET)
+			stopTime = datetime.utcfromtimestamp(Program['end']).strftime('%Y%m%d%H%M%S ' + OFFSET)
 			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']))
 			ET.SubElement(program, 'title', lang='da').text = ValidateXMLStr(Program['title'])
@@ -173,18 +176,14 @@ def doCreateXMLFile(menuCall = False):
 			if len(Actor_list) > 0:
 				Actor_list = Actor_list.split(",")
 				for actor in Actor_list:
-					role = ''
 					# Replace strange :|apostrofe|;
 					actor = actor.replace(":|apostrofe|;", "'")
-					# Some times YouSee has "Character: Actor syntax, so let's split them up
+					# Some times YouSee has "Character: Actor) syntax, so let's get rid of the character
 					if actor.rfind(':') > -1:
-						role, actor = actor.split(':')
+						actor = actor[actor.rfind(':') + 1:]
 					# Skip leading space
 					if actor.startswith(" "): actor = actor[1:]
-					if role != '':
-						ET.SubElement(credits, 'actor', role=role, lang='da').text = actor
-					else:
-						ET.SubElement(credits, 'actor', lang='da').text = actor
+					ET.SubElement(credits, 'actor', lang='da').text = actor
 			# Video details....Here we lie, but should be correct in about 90% of the times
 			video = ET.SubElement(program, 'video', lang='en')
 			ET.SubElement(video, 'quality', lang='en').text = 'HDTV'
@@ -323,4 +322,11 @@ def ValidateXMLStr(xmlstr):
                    unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff))
 	xmlstr = re.sub(RE_XML_ILLEGAL, "?", xmlstr)
 	return xmlstr
+
+####################################################################################################
+# Get Somer/Winter time Offset
+####################################################################################################
+@route(PREFIX + '/getOffSet')
+def getOffSet():
+	return datetime.now(pytz.timezone('Europe/Copenhagen')).strftime('%z')
 
