@@ -14,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.6'
+VERSION = ' V0.0.0.7'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -125,9 +125,11 @@ def doCreateXMLFile(menuCall = False):
 	getChannelsEnabled()
 	if not bFirstRun:
 		Programs = getChannelInfo()
-		for Program in Programs:			
-			startTime = datetime.utcfromtimestamp(Program['begin']).strftime('%Y%m%d%H%M%S ' + OFFSET)
-			stopTime = datetime.utcfromtimestamp(Program['end']).strftime('%Y%m%d%H%M%S ' + OFFSET)
+		for Program in Programs:
+			startTimeRAW = int(datetime.utcfromtimestamp(Program['begin']).strftime('%Y%m%d%H%M')) + int(OFFSET[1:])
+			startTime = str(startTimeRAW) + '00 ' + OFFSET
+			stopTimeRAW = int(datetime.utcfromtimestamp(Program['end']).strftime('%Y%m%d%H%M')) + int(OFFSET[1:])
+			stopTime = str(stopTimeRAW) + '00 ' + OFFSET
 			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']))
 			ET.SubElement(program, 'title', lang='da').text = ValidateXMLStr(Program['title'])
@@ -324,7 +326,7 @@ def ValidateXMLStr(xmlstr):
 	return xmlstr
 
 ####################################################################################################
-# Get Somer/Winter time Offset
+# Get Summer/Winter time Offset
 ####################################################################################################
 @route(PREFIX + '/getOffSet')
 def getOffSet():
