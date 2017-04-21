@@ -14,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.7'
+VERSION = ' V0.0.0.8'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -125,11 +125,10 @@ def doCreateXMLFile(menuCall = False):
 	getChannelsEnabled()
 	if not bFirstRun:
 		Programs = getChannelInfo()
+		DSTHOURS = int((OFFSET)[2:-2])		
 		for Program in Programs:
-			startTimeRAW = int(datetime.utcfromtimestamp(Program['begin']).strftime('%Y%m%d%H%M')) + int(OFFSET[1:])
-			startTime = str(startTimeRAW) + '00 ' + OFFSET
-			stopTimeRAW = int(datetime.utcfromtimestamp(Program['end']).strftime('%Y%m%d%H%M')) + int(OFFSET[1:])
-			stopTime = str(stopTimeRAW) + '00 ' + OFFSET
+			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
+			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']))
 			ET.SubElement(program, 'title', lang='da').text = ValidateXMLStr(Program['title'])
@@ -162,7 +161,7 @@ def doCreateXMLFile(menuCall = False):
 						Log.Debug('Missing episode info for %s, so adding dummy info as %s:%s' %(Program['title'], Episode, Total))
 					ET.SubElement(program, 'episode-num', system='xmltv_ns').text = Episode + '.' + Total + '.'	
 			except Exception, e:
-				Log.Exception('Exception when digesting %s with the error %s' %(Program['title'], e))
+				Log.Exception('Exception when digesting %s with the error %s' %(Program['title'], str(e)))
 				continue
 			#Credits
 			credits = ET.SubElement(program, 'credits', lang='da')
