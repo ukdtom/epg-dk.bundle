@@ -125,15 +125,25 @@ def doCreateXMLFile(menuCall = False):
 	getChannelsEnabled()
 	if not bFirstRun:
 		Programs = getChannelInfo()
-		DSTHOURS = int((OFFSET)[2:-2])		
+		DSTHOURS = int((OFFSET)[2:-2])
+		regexSubtitle = re.compile('^\(([^\)]+)\)\.')
 		for Program in Programs:
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']))
-			ET.SubElement(program, 'title', lang='da').text = ValidateXMLStr(Program['title'])
-			ET.SubElement(program, 'desc', lang='da').text = ValidateXMLStr(Program['description'])
+			title = ValidateXMLStr(Program['title'])
+			subtitle = ''
+			description = ValidateXMLStr(Program['description'])
+			ET.SubElement(program, 'title', lang='da').text = title
+			ET.SubElement(program, 'desc', lang='da').text = description
 			ET.SubElement(program, 'icon', src=poster)
+			#Subtitle (regex)
+			mSubtitle = regexSubtitle.match(description)
+			if mSubtitle:
+				subtitle = mSubtitle.group(1)
+				if subtitle != title:
+					ET.SubElement(program, 'sub-title', lang='da').text = subtitle.replace(title+': ', '').lstrip()
 			# Category
 			Program['category_string'] = ValidateXMLStr(Program['category_string'])
 			ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['category_string'])
@@ -151,17 +161,17 @@ def doCreateXMLFile(menuCall = False):
 							Episode, Total = Program['series_info'].split(':')
 						else:
 							Episode = Program['series_info']
-							Total = Episode	
+							Total = 1	
 						Episode = str(int(Episode)-1)
 						Total = str(int(Total)-1)
 					else:
 						# Episode Missing :-(					
 						Episode = '0'
 						Total = '0'
-						Log.Debug('Missing episode info for %s, so adding dummy info as %s:%s' %(Program['title'], Episode, Total))
-					ET.SubElement(program, 'episode-num', system='xmltv_ns').text = Episode + '.' + Total + '.'	
+						Log.Debug('Missing episode info for %s, so adding dummy info as %s:%s' %(title, Total, Episode))
+					ET.SubElement(program, 'episode-num', system='xmltv_ns').text = Total + '.' + Episode + '.'	
 			except Exception, e:
-				Log.Exception('Exception when digesting %s with the error %s' %(Program['title'], str(e)))
+				Log.Exception('Exception when digesting %s with the error %s' %(title, str(e)))
 				continue
 			#Credits
 			credits = ET.SubElement(program, 'credits', lang='da')
