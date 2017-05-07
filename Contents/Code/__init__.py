@@ -126,24 +126,32 @@ def doCreateXMLFile(menuCall = False):
 	if not bFirstRun:
 		Programs = getChannelInfo()
 		DSTHOURS = int((OFFSET)[2:-2])
-		regexSubtitle = re.compile('^\(([^\)]+)\)\.')
-		for Program in Programs:
+		rxSubtitle = re.compile('^\(([^\)]+)\)\.')
+		for Program in Programs:		
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
-			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']))
+			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']), id=str(Program['id']))
 			title = ValidateXMLStr(Program['title'])
-			subtitle = ''
 			description = ValidateXMLStr(Program['description'])
 			ET.SubElement(program, 'title', lang='da').text = title
-			ET.SubElement(program, 'desc', lang='da').text = description
-			ET.SubElement(program, 'icon', src=poster)
-			#Subtitle (regex)
-			mSubtitle = regexSubtitle.match(description)
+			
+			# Subtitle (regex)
+			bSubtitleSet = False			
+			mSubtitle = rxSubtitle.match(description)
 			if mSubtitle:
-				subtitle = mSubtitle.group(1)
+				# Extract subtitle from description
+				subtitle = mSubtitle.group(1).strip()
+				# Remove subtitle section from description
+				description = description.replace(mSubtitle.group(0), '').lstrip()
+				description = description.replace(subtitle + '.', '').lstrip()
 				if subtitle != title:
-					ET.SubElement(program, 'sub-title', lang='da').text = subtitle.replace(title+': ', '').lstrip()
+					ET.SubElement(program, 'sub-title', lang='da').text = subtitle.replace(title + ': ', '').lstrip()
+					bSubtitleSet = True		
+
+			ET.SubElement(program, 'desc', lang='da').text = description					
+			ET.SubElement(program, 'icon', src=poster)
+					
 			# Category
 			Program['category_string'] = ValidateXMLStr(Program['category_string'])
 			ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['category_string'])
@@ -153,6 +161,7 @@ def doCreateXMLFile(menuCall = False):
 				ET.SubElement(program, 'category', lang='en').text = 'sports'
 			if ValidateXMLStr(Program['subcategory_string']) != ValidateXMLStr(Program['category_string']):
 				ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['subcategory_string'])
+				
 			#Episode info
 			try:
 				if Program['is_series']:
@@ -161,14 +170,14 @@ def doCreateXMLFile(menuCall = False):
 							Episode, Total = Program['series_info'].split(':')
 						else:
 							Episode = Program['series_info']
-							Total = 1	
+							Total = 1
 						Episode = str(int(Episode)-1)
 						Total = str(int(Total)-1)
 					else:
 						# Episode Missing :-(					
 						Episode = '0'
 						Total = '0'
-						Log.Debug('Missing episode info for %s, so adding dummy info as %s:%s' %(title, Total, Episode))
+						Log.Debug('Missing episode info for "%s", so adding dummy info as %s:%s' %(title, Total, Episode))
 					ET.SubElement(program, 'episode-num', system='xmltv_ns').text = Total + '.' + Episode + '.'	
 			except Exception, e:
 				Log.Exception('Exception when digesting %s with the error %s' %(title, str(e)))
@@ -340,4 +349,3 @@ def ValidateXMLStr(xmlstr):
 @route(PREFIX + '/getOffSet')
 def getOffSet():
 	return datetime.now(pytz.timezone('Europe/Copenhagen')).strftime('%z')
-
