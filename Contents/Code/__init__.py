@@ -14,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.9'
+VERSION = ' V0.0.0.10'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -126,7 +126,8 @@ def doCreateXMLFile(menuCall = False):
 	if not bFirstRun:
 		Programs = getChannelInfo()
 		DSTHOURS = int((OFFSET)[2:-2])
-		rxSubtitle = re.compile('^\(([^\)]+)\)\.')
+		rxSubtitleParentes = re.compile('^\(([^\)]+)\)(\.)?')
+		rxSubtitleQuoted = re.compile('^\"([^\"]+)\"(\.)?')
 		for Program in Programs:		
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
@@ -134,24 +135,30 @@ def doCreateXMLFile(menuCall = False):
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']), id=str(Program['id']))
 			title = ValidateXMLStr(Program['title'])
 			description = ValidateXMLStr(Program['description'])
-			ET.SubElement(program, 'title', lang='da').text = title
-			
-			# Subtitle (regex)
-			bSubtitleSet = False			
-			mSubtitle = rxSubtitle.match(description)
+			# Sub-title (regex)
+			subtitle = ''
+			bSubtitleFound = False			
+			mSubtitle = rxSubtitleParentes.match(description)
+			if not mSubtitle:
+				mSubtitle = rxSubtitleQuoted.match(description)	
 			if mSubtitle:
-				# Extract subtitle from description
+				# Extract sub-title from description
 				subtitle = mSubtitle.group(1).strip()
-				# Remove subtitle section from description
+				# Remove extracted sub-title from description
 				description = description.replace(mSubtitle.group(0), '').lstrip()
 				description = description.replace(subtitle + '.', '').lstrip()
 				if subtitle != title:
-					ET.SubElement(program, 'sub-title', lang='da').text = subtitle.replace(title + ': ', '').lstrip()
-					bSubtitleSet = True		
-
-			ET.SubElement(program, 'desc', lang='da').text = description					
+					# Check if title starts with extracted sub-title (switch)
+					if title.startswith(subtitle):
+						titleTemp = title.replace(subtitle + ': ', '').lstrip()
+						title = subtitle
+						subtitle = titleTemp
+					bSubtitleFound = True
+			ET.SubElement(program, 'title', lang='da').text = title
+			if bSubtitleFound:
+				ET.SubElement(program, 'sub-title', lang='da').text = subtitle.replace(title + ': ', '').lstrip()
+			ET.SubElement(program, 'desc', lang='da').text = description
 			ET.SubElement(program, 'icon', src=poster)
-					
 			# Category
 			Program['category_string'] = ValidateXMLStr(Program['category_string'])
 			ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['category_string'])
@@ -161,7 +168,6 @@ def doCreateXMLFile(menuCall = False):
 				ET.SubElement(program, 'category', lang='en').text = 'sports'
 			if ValidateXMLStr(Program['subcategory_string']) != ValidateXMLStr(Program['category_string']):
 				ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['subcategory_string'])
-				
 			#Episode info
 			try:
 				if Program['is_series']:
@@ -174,11 +180,11 @@ def doCreateXMLFile(menuCall = False):
 						Episode = str(int(Episode)-1)
 						Total = str(int(Total)-1)
 					else:
-						# Episode Missing :-(					
+						# Episode Missing :-(
 						Episode = '0'
 						Total = '0'
 						Log.Debug('Missing episode info for "%s", so adding dummy info as %s:%s' %(title, Total, Episode))
-					ET.SubElement(program, 'episode-num', system='xmltv_ns').text = Total + '.' + Episode + '.'	
+					ET.SubElement(program, 'episode-num', system='xmltv_ns').text = Total + '.' + Episode + '.'
 			except Exception, e:
 				Log.Exception('Exception when digesting %s with the error %s' %(title, str(e)))
 				continue
@@ -191,7 +197,7 @@ def doCreateXMLFile(menuCall = False):
 				for director in Director_list:
 					if director.startswith(" "): director = director[1:]
 					ET.SubElement(credits, 'director', lang='da').text = director
-			#	actor if present
+			# Actor if present
 			Actor_list = ValidateXMLStr(Program['cast'])
 			if len(Actor_list) > 0:
 				Actor_list = Actor_list.split(",")
@@ -208,7 +214,7 @@ def doCreateXMLFile(menuCall = False):
 			video = ET.SubElement(program, 'video', lang='en')
 			ET.SubElement(video, 'quality', lang='en').text = 'HDTV'
 	tree = ET.ElementTree(root)
-	xmlstr = unicode(ET.tostring(tree.getroot(), xml_declaration=True, encoding="utf-8", pretty_print=True, doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))	
+	xmlstr = unicode(ET.tostring(tree.getroot(), xml_declaration=True, encoding="utf-8", pretty_print=True, doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))
 	with io.open(xmlFile, "w", encoding="utf-8") as f:
 		f.write(xmlstr)
 	Log.Info('All done creating the XML File')
@@ -259,7 +265,7 @@ def getChannelInfo():
 			# Now grab program info in small chuncks
 			count = 0
 			while True:
-				URL = url + 'channel_id/' + str(id) + '/offset/' + str(offsetTime) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB			
+				URL = url + 'channel_id/' + str(id) + '/offset/' + str(offsetTime) + programPartURL + str(count) + '/itemCount/' + PROGRAMSTOGRAB
 				Info = JSON.ObjectFromURL(URL, headers=HEADER)
 				Programs = Info['programs']
 				for Program in Programs:			
