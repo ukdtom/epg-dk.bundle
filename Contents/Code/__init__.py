@@ -149,7 +149,7 @@ def doCreateXMLFile(menuCall = False):
 				description = description.replace(subtitle + '.', '').lstrip()
 				if subtitle != title:
 					# Check if title starts with extracted sub-title (switch)
-					if title.startswith(subtitle):
+					if title.startswith(subtitle + ': '):
 						titleTemp = title.replace(subtitle + ': ', '').lstrip()
 						title = subtitle
 						subtitle = titleTemp
