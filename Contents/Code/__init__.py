@@ -168,7 +168,7 @@ def doCreateXMLFile(menuCall = False):
 				ET.SubElement(program, 'category', lang='en').text = 'sports'
 			if ValidateXMLStr(Program['subcategory_string']) != ValidateXMLStr(Program['category_string']):
 				ET.SubElement(program, 'category', lang='da').text = ValidateXMLStr(Program['subcategory_string'])
-			#Episode info
+			# Episode info
 			try:
 				if Program['is_series']:
 					if Program['series_info'] != '':
@@ -188,7 +188,7 @@ def doCreateXMLFile(menuCall = False):
 			except Exception, e:
 				Log.Exception('Exception when digesting %s with the error %s' %(title, str(e)))
 				continue
-			#Credits
+			# Credits
 			credits = ET.SubElement(program, 'credits', lang='da')
 			# Directors if present
 			Director_list = ValidateXMLStr(Program['directors'])
