@@ -1,13 +1,12 @@
 v0.0.0.9:
-	-	Shows:
+	- Shows:
 		- Fixed #16 (Thanks mm98)
 	- General:
 		- If origen title was part of description, this is now extracted as a sub-title (thanks mm98)
 
 v0.0.0.8:
-	-	Fixed:
-		- #13 Issue with manipulating timastamps sometimes became invalid.
-					Thanks goes to forum user mm98 for spotting this
+	- Fixed:
+		- #13 Issue with manipulating timestamps sometimes became invalid. Thanks goes to forum user mm98 for spotting this
 
 v0.0.0.7:
 	- Fixed:
