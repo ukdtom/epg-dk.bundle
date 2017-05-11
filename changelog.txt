@@ -1,3 +1,7 @@
+v0.0.0.10:
+	- General:
+		- Updated "sub-title" parser. Added detection of quoted sub-title in description text.
+
 v0.0.0.9:
 	- Shows:
 		- Fixed #16 (Thanks mm98)
