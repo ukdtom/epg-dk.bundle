@@ -23,10 +23,10 @@ PREFIX = '/applications/epg-dk'
 APPGUID = '76a8cf36-7c2b-11e4-8b4d-00079cdf80b2'
 BASEURL = 'http://api.yousee.tv/rest/tvguide/'
 HEADER = {'X-API-KEY' : 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
-PROGRAMSTOGRAB = '10'
+PROGRAMSTOGRAB = '20'
 bFirstRun = False
 DEBUGMODE = False
-FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string,subcategory_string,directors,cast/startIndex'
+FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_info,category_string,subcategory_string,directors,cast/startIndex'
 
 ####################################################################################################
 # Start function
@@ -126,8 +126,8 @@ def doCreateXMLFile(menuCall = False):
 	if not bFirstRun:
 		Programs = getChannelInfo()
 		DSTHOURS = int((OFFSET)[2:-2])
-		rxSubtitleParentes = re.compile('^\(([^\)]{2,})\)(\.)?')
-		rxSubtitleQuoted = re.compile('^\"([^\"]{2,})\"(\.)?')
+		rxSubtitleParentes = re.compile('^\(([^\.]+)\)\.')
+		rxSubtitleQuoted = re.compile('^\"([^\"]+)\"(\.)?')
 		for Program in Programs:		
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
