@@ -1,3 +1,7 @@
+v0.0.0.11:
+	- General:
+		- Updated "sub-title" parser. Would in some strange cases extract partial sub-title ex. "(m)" or "(k)".
+
 v0.0.0.10:
 	- General:
 		- Updated "sub-title" parser. Added detection of quoted sub-title in description text.
