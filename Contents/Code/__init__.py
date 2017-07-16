@@ -14,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.10'
+VERSION = ' V0.0.0.11'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -126,8 +126,8 @@ def doCreateXMLFile(menuCall = False):
 	if not bFirstRun:
 		Programs = getChannelInfo()
 		DSTHOURS = int((OFFSET)[2:-2])
-		rxSubtitleParentes = re.compile('^\(([^\)]+)\)(\.)?')
-		rxSubtitleQuoted = re.compile('^\"([^\"]+)\"(\.)?')
+		rxSubtitleParentes = re.compile('^\(([^\)]{2,})\)(\.)?')
+		rxSubtitleQuoted = re.compile('^\"([^\"]{2,})\"(\.)?')
 		for Program in Programs:		
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
