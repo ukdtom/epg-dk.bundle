@@ -14,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.10'
+VERSION = ' V0.0.0.11'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -26,7 +26,7 @@ HEADER = {'X-API-KEY' : 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
 PROGRAMSTOGRAB = '10'
 bFirstRun = False
 DEBUGMODE = False
-FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_name,series_info,category_string,subcategory_string,directors,cast/startIndex'
+FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_info,category_string,subcategory_string,directors,cast/startIndex'
 
 ####################################################################################################
 # Start function
@@ -126,7 +126,7 @@ def doCreateXMLFile(menuCall = False):
 	if not bFirstRun:
 		Programs = getChannelInfo()
 		DSTHOURS = int((OFFSET)[2:-2])
-		rxSubtitleParentes = re.compile('^\(([^\)]+)\)(\.)?')
+		rxSubtitleParentes = re.compile('^\(([^\.]+)\)\.')
 		rxSubtitleQuoted = re.compile('^\"([^\"]+)\"(\.)?')
 		for Program in Programs:		
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
