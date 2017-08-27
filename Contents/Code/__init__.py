@@ -14,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.11'
+VERSION = ' V0.0.0.12'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -23,7 +23,7 @@ PREFIX = '/applications/epg-dk'
 APPGUID = '76a8cf36-7c2b-11e4-8b4d-00079cdf80b2'
 BASEURL = 'http://api.yousee.tv/rest/tvguide/'
 HEADER = {'X-API-KEY' : 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
-PROGRAMSTOGRAB = '10'
+PROGRAMSTOGRAB = '20'
 bFirstRun = False
 DEBUGMODE = False
 FIELDS = 'id,channel,begin,end,title,description,imageprefix,images_fourbythree,is_series,series_info,category_string,subcategory_string,directors,cast/startIndex'
@@ -109,6 +109,15 @@ def createXMLFile(menuCall = False):
 @route(PREFIX + '/createXMLFile')
 def doCreateXMLFile(menuCall = False):
 	xmlFile = Prefs['Store_Path']
+
+	# Thumbnail Size
+	thumbSize = 'xxlarge'
+	rxThumbSize = re.compile('^([a-zA-Z]+)')
+	mThumbSize = rxThumbSize.match(str(Prefs['Thumb_Size']))
+	if mThumbSize:
+		thumbSize = mThumbSize.group(0).lower()
+	Log.Debug('Thumbnail size parsed: %s from %s' %(thumbSize, Prefs['Thumb_Size']))
+	
 	root = ET.Element("tv")
 	root.set('generator-info-name', NAME)
 	root.set('date', datetime.now().strftime('%Y%m%d%H%M%S'))
@@ -131,7 +140,7 @@ def doCreateXMLFile(menuCall = False):
 		for Program in Programs:		
 			startTime = (datetime.utcfromtimestamp(Program['begin']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
 			stopTime = (datetime.utcfromtimestamp(Program['end']) + timedelta(hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
-			poster = Program['imageprefix'] + Program['images_fourbythree']['xxlarge']
+			poster = Program['imageprefix'] + Program['images_fourbythree'][thumbSize]
 			program = ET.SubElement(root, 'programme', start=startTime, stop=stopTime, channel=str(Program['channel']), id=str(Program['id']))
 			title = ValidateXMLStr(Program['title'])
 			description = ValidateXMLStr(Program['description'])
