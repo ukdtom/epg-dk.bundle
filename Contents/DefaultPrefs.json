@@ -6,6 +6,13 @@
 		"default": "/somedir/somefile.xml   or C:\\Somedir\\Somefile.xml"
 	},
 	{
+		"id": "Thumb_Size",
+		"type": "enum",
+		"label": "Thumbnail size (1440x1080, 960x720, 713x535 or 156x117)",
+		"values": ["XXLarge (1440x1080)", "XLarge (960x720)", "Large (713x535)", "Small (156x117)"],
+		"default": "XXLarge (1440x1080)"
+	},
+	{
 		"id":"DaysToFetch",
 		"label":"Amount of days to fetch. This number most be in the range of 1 to 7",
 		"type":"text",

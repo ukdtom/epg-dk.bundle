@@ -1,3 +1,7 @@
+v0.0.0.12:
+	- Settings:
+		- Added the option to configure Thumbnail size (XXLarge, XLarge, Large and Small).
+
 v0.0.0.11:
 	- General:
 		- Updated "sub-title" parser. Would in some strange cases extract partial sub-title ex. "(m)" or "(k)".
