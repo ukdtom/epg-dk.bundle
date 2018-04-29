@@ -15,7 +15,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.12'
+VERSION = ' V0.0.0.13'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -47,12 +47,11 @@ def Start():
                 NAME + '.bundle',
                 'debug')
     DEBUGMODE = os.path.isfile(debugFile)
+    logStr = ''.join((
+        '********  Started ' + NAME + ' ' + VERSION,
+        ' on ',
+        Platform.OS))
     if DEBUGMODE:
-        logStr = ''.join((
-            '********  Started ' + NAME + ' ' + VERSION,
-            ' on ',
-            Platform.OS
-        ))
         print(logStr + '  ********* DEBUG MODE ******')
         Log.Debug(logStr + '  ********* DEBUG MODE ******')
     else:
