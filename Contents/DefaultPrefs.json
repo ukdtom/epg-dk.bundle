@@ -40,6 +40,6 @@
 		"id":"MapFile_Path",
 		"label":"Absolute path and filename of map file",
 		"type":"text",
-		"default": "/somedir/somefile.xml   or C:\\Somedir\\Somefile.xml"
+		"default": "/somedir/map.json   or C:\\Somedir\\map.json"
 	}    
 ]
