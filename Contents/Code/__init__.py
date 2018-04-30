@@ -9,6 +9,7 @@
 # Imports
 import io
 import os
+import json
 from lxml import etree as ET
 import re
 import pytz
@@ -127,7 +128,7 @@ def doCreateXMLFile(menuCall=False):
             'Tommy Winther: https://github.com/twinther/script.tvguide')
     Channels = getChannelsList()
     for Channel in Channels:
-        channel = ET.SubElement(root, 'channel', id=str(Channel['id']))
+        channel = ET.SubElement(root, 'channel', id=mapID(str(Channel['id'])))
         ET.SubElement(
             channel,
             'display-name').text = ValidateXMLStr(Channel['name'])
@@ -157,7 +158,7 @@ def doCreateXMLFile(menuCall=False):
                 'programme',
                 start=startTime,
                 stop=stopTime,
-                channel=str(Program['channel']),
+                channel=mapID(str(Program['channel'])),
                 id=str(Program['id']))
             title = ValidateXMLStr(Program['title'])
             description = ValidateXMLStr(Program['description'])
@@ -430,3 +431,19 @@ def ValidateXMLStr(xmlstr):
 def getOffSet():
     ''' Get Summer/Winter time Offset '''
     return datetime.now(pytz.timezone('Europe/Copenhagen')).strftime('%z')
+
+
+def mapID(ID):
+    if Prefs['EnableMapFile']:
+        # So Map File is enabled, so let's check if it exist first
+        try:
+            data = json.load(io.open(Prefs['MapFile_Path']))
+            if ID not in data:
+                return ID
+            else:
+                return str(data[ID])
+        except Exception, e:
+            Log.Debug('Map file not found, so lets simply return the ID')
+            return ID
+    else:
+        return ID
