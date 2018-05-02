@@ -1,3 +1,6 @@
+v0.0.0.13:
+	- General:
+		- Added channel id to display-name sub element.
 v0.0.0.12:
 	- Settings:
 		- Added the option to configure Thumbnail size (XXLarge, XLarge, Large and Small).
