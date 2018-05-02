@@ -129,6 +129,7 @@ def doCreateXMLFile(menuCall = False):
 	for Channel in Channels:
 		channel = ET.SubElement(root, 'channel', id=str(Channel['id']))
 		ET.SubElement(channel, 'display-name').text = ValidateXMLStr(Channel['name'])
+		ET.SubElement(channel, 'display-name').text = str(Channel['id']))
 		ET.SubElement(channel, 'icon', src=Channel['logo'])
 	# Just a brief check to make sure, that bFirstRun is stamped correctly
 	getChannelsEnabled()
