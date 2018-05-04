@@ -28,6 +28,7 @@ HEADER = {'X-API-KEY': 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
 PROGRAMSTOGRAB = '20'
 bFirstRun = False
 DEBUGMODE = False
+TIMEOUT = 90
 FIELDS = ''.join((
             'id,channel,begin,end,',
             'title,description,imageprefix,'
@@ -295,7 +296,7 @@ def getChannelsList():
     ''' Get Channel list from YouSee '''
     URL = BASEURL + 'channels/format/json/fields/id,name,logo'
     # Get the json from TDC
-    Channellist = JSON.ObjectFromURL(URL, headers=HEADER)
+    Channellist = JSON.ObjectFromURL(URL, headers=HEADER, timeout=TIMEOUT)
     # Walk the channel list one by one
     for Group in Channellist:
         # Only get "All"
@@ -327,7 +328,10 @@ def getChannelInfo():
                 '/offset/',
                 str(offsetTime),
                 '/format/json/apiversion/2/fields/totalprograms'))
-            totaljson = JSON.ObjectFromURL(URL, headers=HEADER)
+            totaljson = JSON.ObjectFromURL(
+                            URL,
+                            headers=HEADER,
+                            timeout=TIMEOUT)
             total = totaljson.get('totalprograms')
             Log.Debug('Total amount to fetch for channel %s is %s' % (
                 str(id), total))
@@ -374,7 +378,10 @@ def getChannelsEnabled():
         Log.Debug('%s is running for the first time, so grap all channels' % (
             NAME))
         bFirstRun = True
-        Channellist = JSON.ObjectFromURL(urlYouSee, headers=HEADER)
+        Channellist = JSON.ObjectFromURL(
+                        urlYouSee,
+                        headers=HEADER,
+                        timeout=TIMEOUT)
         for Group in Channellist:
             # Only get "All"
             if Group['name'] == 'All':
