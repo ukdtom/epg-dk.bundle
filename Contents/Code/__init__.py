@@ -127,7 +127,6 @@ def doCreateXMLFile(menuCall=False):
             Channel['name'])
         ET.SubElement(channel, 'display-name').text = str(Channel['id'])
         ET.SubElement(channel, 'icon', src=Channel['logo'])
-        print 'Ged', Channel['logo']
     # Just a brief check to make sure, that bFirstRun is stamped correctly
     getChannelsEnabled()
     if not bFirstRun:
@@ -311,7 +310,6 @@ def getChannelInfo():
                 '/offset/',
                 str(offsetTime),
                 '/format/json/apiversion/2/fields/totalprograms'))
-            print 'Ged2', URL
             totaljson = JSON.ObjectFromURL(URL, headers=HEADER)
             total = totaljson.get('totalprograms')
             Log.Debug('Total amount to fetch for channel %s is %s' % (
