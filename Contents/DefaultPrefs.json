@@ -29,5 +29,5 @@
 		"label":"What time to schedule an automaticly update the xmltv file in the format HH:MM",
 		"type":"text",
 		"default": "01:00"
-	}
+    }
 ]
