@@ -29,17 +29,5 @@
 		"label":"What time to schedule an automaticly update the xmltv file in the format HH:MM",
 		"type":"text",
 		"default": "01:00"
-    },
-    {
-		"id":"EnableMapFile",
-		"label":"Enable Map File",
-		"type":"bool",
-		"default": "False"        
-    },
-	{
-		"id":"MapFile_Path",
-		"label":"Absolute path and filename of map file",
-		"type":"text",
-		"default": "/somedir/map.json   or C:\\Somedir\\map.json"
-	}    
+    }
 ]
