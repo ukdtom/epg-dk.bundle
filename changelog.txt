@@ -1,3 +1,8 @@
+v0.0.0.13:
+    - pep8
+    - Added channel id to display-name sub element.
+        - (Thanks to zynine)
+
 v0.0.0.12:
 	- Settings:
 		- Added the option to configure Thumbnail size (XXLarge, XLarge, Large and Small).
