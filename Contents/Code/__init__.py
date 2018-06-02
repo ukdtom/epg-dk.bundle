@@ -1,15 +1,14 @@
-#############################################################################
+###########################################################################
 # This plugin will downloads a danish program guide from YouSee
 #
 # Made by
 # dane22....A Plex Community member
 #
-#############################################################################
+###########################################################################
 
 # Imports
 import io
 import os
-import json
 from lxml import etree as ET
 import re
 import pytz
@@ -28,36 +27,32 @@ HEADER = {'X-API-KEY': 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'}
 PROGRAMSTOGRAB = '20'
 bFirstRun = False
 DEBUGMODE = False
-TIMEOUT = 90
 FIELDS = ''.join((
-            'id,channel,begin,end,',
-            'title,description,imageprefix,'
-            'images_fourbythree,is_series,series_info,category_string,',
-            'subcategory_string,directors,cast/startIndex'))
+    'id,channel,begin,end,title,description,',
+    'imageprefix,images_fourbythree,is_series,'
+    'series_info,category_string,',
+    'subcategory_string,directors,cast/startIndex'
+))
 
 
 def Start():
-    '''
-    Start Function
-    '''
+    ''' Start function '''
     global DEBUGMODE
     global OFFSET
     # Switch to debug mode if needed
     debugFile = Core.storage.join_path(
-                Core.app_support_path,
-                Core.config.bundles_dir_name,
-                NAME + '.bundle',
-                'debug')
+        Core.app_support_path,
+        Core.config.bundles_dir_name,
+        NAME + '.bundle', 'debug')
     DEBUGMODE = os.path.isfile(debugFile)
-    logStr = ''.join((
-        '********  Started ' + NAME + ' ' + VERSION,
-        ' on ',
-        Platform.OS))
     if DEBUGMODE:
-        print(logStr + '  ********* DEBUG MODE ******')
-        Log.Debug(logStr + '  ********* DEBUG MODE ******')
+        print("********  Started %s on %s  ******** DEBUG MODE ******" % (
+            NAME + ' ' + VERSION, Platform.OS))
+        Log.Debug("*******  Started %s on %s  ********* DEBUG MODE ******" % (
+            NAME + VERSION, Platform.OS))
     else:
-        Log.Debug(logStr)
+        Log.Debug("*******  Started %s on %s  ***********" % (
+            NAME + VERSION, Platform.OS))
     OFFSET = getOffSet()
     Plugin.AddViewGroup('List', viewMode='List', mediaType='items')
     Plugin.AddViewGroup("Details", viewMode="InfoList", mediaType="items")
@@ -71,7 +66,7 @@ def Start():
 @handler(PREFIX, NAME, thumb=ICON, art=ART)
 @route(PREFIX + '/MainMenu')
 def MainMenu():
-    ''' Main Menu '''
+    ''' Main menu '''
     Log.Debug("**********  Starting MainMenu  **********")
     ObjectContainer.art = R(ART)
     ObjectContainer.title1 = NAME + VERSION
@@ -97,9 +92,9 @@ def createXMLFile(menuCall=False):
     ''' Create XMLTV File Thread '''
     message = 'XML Generation started'
     oc = ObjectContainer(
-            title1='Create XML File',
-            no_cache=True,
-            message=message)
+        title1='Create XML File',
+        no_cache=True,
+        message=message)
     Thread.CreateTimer(1, doCreateXMLFile, menuCall=menuCall)
     return oc
 
@@ -108,7 +103,6 @@ def createXMLFile(menuCall=False):
 def doCreateXMLFile(menuCall=False):
     ''' Create XMLTV File '''
     xmlFile = Prefs['Store_Path']
-
     # Thumbnail Size
     thumbSize = 'xxlarge'
     rxThumbSize = re.compile('^([a-zA-Z]+)')
@@ -116,8 +110,7 @@ def doCreateXMLFile(menuCall=False):
     if mThumbSize:
         thumbSize = mThumbSize.group(0).lower()
     Log.Debug('Thumbnail size parsed: %s from %s' % (
-                thumbSize,
-                Prefs['Thumb_Size']))
+        thumbSize, Prefs['Thumb_Size']))
     root = ET.Element("tv")
     root.set('generator-info-name', NAME)
     root.set('date', datetime.now().strftime('%Y%m%d%H%M%S'))
@@ -125,14 +118,14 @@ def doCreateXMLFile(menuCall=False):
     root.set('Author', 'dane22, a Plex Community member')
     root.set('Sourcecode', 'https://github.com/ukdtom/epg-dk.bundle')
     root.set(
-            'Credits',
-            'Tommy Winther: https://github.com/twinther/script.tvguide')
+        'Credits',
+        'Tommy Winther: https://github.com/twinther/script.tvguide')
     Channels = getChannelsList()
     for Channel in Channels:
-        channel = ET.SubElement(root, 'channel', id=mapID(str(Channel['id'])))
-        ET.SubElement(
-            channel,
-            'display-name').text = ValidateXMLStr(Channel['name'])
+        channel = ET.SubElement(root, 'channel', id=str(Channel['id']))
+        ET.SubElement(channel, 'display-name').text = ValidateXMLStr(
+            Channel['name'])
+        ET.SubElement(channel, 'display-name').text = str(Channel['id'])
         ET.SubElement(channel, 'icon', src=Channel['logo'])
     # Just a brief check to make sure, that bFirstRun is stamped correctly
     getChannelsEnabled()
@@ -143,23 +136,20 @@ def doCreateXMLFile(menuCall=False):
         rxSubtitleQuoted = re.compile('^\"([^\"]+)\"(\.)?')
         for Program in Programs:
             startTime = (
-                datetime.utcfromtimestamp(
-                    Program['begin']) + timedelta(
-                        hours=DSTHOURS)).strftime(
-                            '%Y%m%d%H%M%S') + ' ' + OFFSET
+                datetime.utcfromtimestamp(Program['begin']) + timedelta(
+                    hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
             stopTime = (
-                datetime.utcfromtimestamp(
-                    Program['end']) + timedelta(
-                        hours=DSTHOURS)).strftime(
-                            '%Y%m%d%H%M%S') + ' ' + OFFSET
-            poster = Program['imageprefix'] + Program[
-                'images_fourbythree'][thumbSize]
+                datetime.utcfromtimestamp(Program['end']) + timedelta(
+                    hours=DSTHOURS)).strftime('%Y%m%d%H%M%S') + ' ' + OFFSET
+            poster = ''.join((
+                Program['imageprefix'],
+                Program['images_fourbythree'][thumbSize]))
             program = ET.SubElement(
                 root,
                 'programme',
                 start=startTime,
                 stop=stopTime,
-                channel=mapID(str(Program['channel'])),
+                channel=str(Program['channel']),
                 id=str(Program['id']))
             title = ValidateXMLStr(Program['title'])
             description = ValidateXMLStr(Program['description'])
@@ -186,9 +176,7 @@ def doCreateXMLFile(menuCall=False):
             ET.SubElement(program, 'title', lang='da').text = title
             if bSubtitleFound:
                 ET.SubElement(
-                    program,
-                    'sub-title',
-                    lang='da').text = subtitle.replace(
+                    program, 'sub-title', lang='da').text = subtitle.replace(
                         title + ': ', '').lstrip()
             ET.SubElement(program, 'desc', lang='da').text = description
             ET.SubElement(program, 'icon', src=poster)
@@ -196,9 +184,7 @@ def doCreateXMLFile(menuCall=False):
             Program['category_string'] = ValidateXMLStr(
                 Program['category_string'])
             ET.SubElement(
-                program,
-                'category',
-                lang='da').text = ValidateXMLStr(
+                program, 'category', lang='da').text = ValidateXMLStr(
                     Program['category_string'])
             if Program['category_string'] == 'Nyheder':
                 ET.SubElement(program, 'category', lang='en').text = 'news'
@@ -208,9 +194,7 @@ def doCreateXMLFile(menuCall=False):
                 Program['subcategory_string']) != ValidateXMLStr(
                     Program['category_string']):
                 ET.SubElement(
-                    program,
-                    'category',
-                    lang='da').text = ValidateXMLStr(
+                    program, 'category', lang='da').text = ValidateXMLStr(
                         Program['subcategory_string'])
             # Episode info
             try:
@@ -227,11 +211,11 @@ def doCreateXMLFile(menuCall=False):
                         # Episode Missing :-(
                         Episode = '0'
                         Total = '0'
-                        logStr = ''.join((
+                        Log.Debug(''.join((
                             'Missing episode info for "%s"' % title,
-                            ' so adding dummy info as %s:%s' % (Total, Episode)
+                            ', so adding dummy info as %s:%s' % (
+                                Total, Episode))
                         ))
-                        Log.Debug(logStr)
                     ET.SubElement(
                         program,
                         'episode-num',
@@ -251,9 +235,7 @@ def doCreateXMLFile(menuCall=False):
                     if director.startswith(" "):
                         director = director[1:]
                     ET.SubElement(
-                        credits,
-                        'director',
-                        lang='da').text = director
+                        credits, 'director', lang='da').text = director
             # Actor if present
             Actor_list = ValidateXMLStr(Program['cast'])
             if len(Actor_list) > 0:
@@ -261,25 +243,25 @@ def doCreateXMLFile(menuCall=False):
                 for actor in Actor_list:
                     # Replace strange :|apostrofe|;
                     actor = actor.replace(":|apostrofe|;", "'")
-                    # Some times YouSee has "Character: Actor) syntax,
-                    # so let's get rid of the character
+                    # Some times YouSee has "Character: Actor) syntax, so
+                    # let's get rid of the character
                     if actor.rfind(':') > -1:
                         actor = actor[actor.rfind(':') + 1:]
                     # Skip leading space
                     if actor.startswith(" "):
                         actor = actor[1:]
                     ET.SubElement(credits, 'actor', lang='da').text = actor
-            # Video details....Here we lie,
-            # but should be correct in about 90% of the times
+            # Video details....Here we lie, but should be
+            # correct in about 90% of the times
             video = ET.SubElement(program, 'video', lang='en')
             ET.SubElement(video, 'quality', lang='en').text = 'HDTV'
     tree = ET.ElementTree(root)
     xmlstr = unicode(ET.tostring(
-                tree.getroot(),
-                xml_declaration=True,
-                encoding="utf-8",
-                pretty_print=True,
-                doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))
+        tree.getroot(),
+        xml_declaration=True,
+        encoding="utf-8",
+        pretty_print=True,
+        doctype='<!DOCTYPE tv SYSTEM "xmltv.dtd">'))
     with io.open(xmlFile, "w", encoding="utf-8") as f:
         f.write(xmlstr)
     Log.Info('All done creating the XML File')
@@ -296,7 +278,7 @@ def getChannelsList():
     ''' Get Channel list from YouSee '''
     URL = BASEURL + 'channels/format/json/fields/id,name,logo'
     # Get the json from TDC
-    Channellist = JSON.ObjectFromURL(URL, headers=HEADER, timeout=TIMEOUT)
+    Channellist = JSON.ObjectFromURL(URL, headers=HEADER)
     # Walk the channel list one by one
     for Group in Channellist:
         # Only get "All"
@@ -328,10 +310,7 @@ def getChannelInfo():
                 '/offset/',
                 str(offsetTime),
                 '/format/json/apiversion/2/fields/totalprograms'))
-            totaljson = JSON.ObjectFromURL(
-                            URL,
-                            headers=HEADER,
-                            timeout=TIMEOUT)
+            totaljson = JSON.ObjectFromURL(URL, headers=HEADER)
             total = totaljson.get('totalprograms')
             Log.Debug('Total amount to fetch for channel %s is %s' % (
                 str(id), total))
@@ -375,13 +354,10 @@ def getChannelsEnabled():
     enableList = XML.ObjectFromURL(url, cacheTime=0)
     # First run or not
     if int(enableList.get('size')) == 0:
-        Log.Debug('%s is running for the first time, so grap all channels' % (
-            NAME))
+        Log.Debug(
+            NAME + ' is running for the first time, so grap all channels')
         bFirstRun = True
-        Channellist = JSON.ObjectFromURL(
-                        urlYouSee,
-                        headers=HEADER,
-                        timeout=TIMEOUT)
+        Channellist = JSON.ObjectFromURL(urlYouSee, headers=HEADER)
         for Group in Channellist:
             # Only get "All"
             if Group['name'] == 'All':
@@ -422,8 +398,8 @@ def scheduler():
 @route(PREFIX + '/ValidateXMLStr')
 def ValidateXMLStr(xmlstr):
     ''' Validate XML String '''
-    # Replace valid utf-8 characters, that doesn't work in
-    # an xml file with a questionmark
+    # Replace valid utf-8 characters, that doesn't
+    # work in an xml file with a questionmark
     RE_XML_ILLEGAL = u'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' + \
         u'|' + \
         u'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' % \
@@ -438,19 +414,3 @@ def ValidateXMLStr(xmlstr):
 def getOffSet():
     ''' Get Summer/Winter time Offset '''
     return datetime.now(pytz.timezone('Europe/Copenhagen')).strftime('%z')
-
-
-def mapID(ID):
-    if Prefs['EnableMapFile']:
-        # So Map File is enabled, so let's check if it exist first
-        try:
-            data = json.load(io.open(Prefs['MapFile_Path']))
-            if ID not in data:
-                return ID
-            else:
-                return str(data[ID])
-        except Exception, e:
-            Log.Debug('Map file not found, so lets simply return the ID')
-            return ID
-    else:
-        return ID
