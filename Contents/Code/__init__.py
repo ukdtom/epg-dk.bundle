@@ -81,6 +81,7 @@ def MainMenu():
     Log.Debug("**********  Ending MainMenu  **********")
     return oc
 
+
 @route(PREFIX + '/ValidatePrefs')
 def ValidatePrefs():
     ''' ValidatePrefs '''
@@ -97,6 +98,7 @@ def createXMLFile(menuCall=False):
         message=message)
     Thread.CreateTimer(1, doCreateXMLFile, menuCall=menuCall)
     return oc
+
 
 @route(PREFIX + '/createXMLFile')
 def doCreateXMLFile(menuCall=False):
