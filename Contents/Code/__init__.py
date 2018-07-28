@@ -81,7 +81,6 @@ def MainMenu():
     Log.Debug("**********  Ending MainMenu  **********")
     return oc
 
-
 @route(PREFIX + '/ValidatePrefs')
 def ValidatePrefs():
     ''' ValidatePrefs '''
