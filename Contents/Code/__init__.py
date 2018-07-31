@@ -16,7 +16,7 @@ import pytz
 from datetime import datetime, timedelta
 
 # Consts used
-VERSION = ' V0.0.0.13'
+VERSION = ' V0.0.0.14'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
