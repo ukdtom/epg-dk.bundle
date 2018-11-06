@@ -13,9 +13,10 @@ from lxml import etree as ET
 import re
 import pytz
 from datetime import datetime, timedelta
+import json
 
 # Consts used
-VERSION = ' V0.0.0.13'
+VERSION = ' V0.0.0.14'
 NAME = 'epg-dk'
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
@@ -33,6 +34,7 @@ FIELDS = ''.join((
     'series_info,category_string,',
     'subcategory_string,directors,cast/startIndex'
 ))
+MAPFILE = 'order.txt'
 
 
 def Start():
@@ -46,8 +48,8 @@ def Start():
         NAME + '.bundle', 'debug')
     DEBUGMODE = os.path.isfile(debugFile)
     if DEBUGMODE:
-        print("********  Started %s on %s  ******** DEBUG MODE ******" % (
-            NAME + ' ' + VERSION, Platform.OS))
+        print("********  Started %s on %s at %s ******** DEBUG MODE ******" % (
+            NAME + ' ' + VERSION, Platform.OS, datetime.now()))
         Log.Debug("*******  Started %s on %s  ********* DEBUG MODE ******" % (
             NAME + VERSION, Platform.OS))
     else:
@@ -284,7 +286,30 @@ def getChannelsList():
         # Only get "All"
         if Group['name'] == 'All':
             Channels = Group['channels']
+            makeMapFileAndCurrent(Channels)
             return Channels
+
+
+def makeMapFileAndCurrent(channels):
+    '''
+    Generates the Channels-Current file
+    Also generates the map file, if it doesn't exists
+    '''
+
+    ChannelsListFile = os.path.join(
+        Core.app_support_path,
+        'Plug-ins',
+        NAME + '.bundle',
+        'Channels-Current.txt')
+    channelListJson = {}
+    pos = 0
+    for channel in channels:
+        channelListJson[channel['id']] = channel['name']
+        pos += 1
+    with io.open(ChannelsListFile, 'w', encoding="utf-8") as ChannelsList:
+        ChannelsList.write(unicode(
+            json.dumps(channelListJson, ensure_ascii=False, indent=4)))
+    return Channels
 
 
 @route(PREFIX + '/getChannelInfo')
