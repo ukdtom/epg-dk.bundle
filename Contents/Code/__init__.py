@@ -34,7 +34,6 @@ FIELDS = ''.join((
     'series_info,category_string,',
     'subcategory_string,directors,cast/startIndex'
 ))
-MAPFILE = 'order.txt'
 
 
 def Start():
@@ -297,19 +296,26 @@ def makeMapFileAndCurrent(channels):
     '''
 
     ChannelsListFile = os.path.join(
-        Core.app_support_path,
-        'Plug-ins',
-        NAME + '.bundle',
+        os.path.dirname(Prefs['Store_Path']),
         'Channels-Current.txt')
     channelListJson = {}
-    pos = 0
     for channel in channels:
         channelListJson[channel['id']] = channel['name']
-        pos += 1
     with io.open(ChannelsListFile, 'w', encoding="utf-8") as ChannelsList:
         ChannelsList.write(unicode(
             json.dumps(channelListJson, ensure_ascii=False, indent=4)))
-    return Channels
+    # Make a Map file, if it doesn't already exists
+    MapFile = os.path.join(
+        os.path.dirname(Prefs['Store_Path']),
+        'Map.txt')
+    if not os.path.exists(MapFile):
+        # We need to create the default map file for our users
+        mapFileJson = {}
+        for channel in channels:
+            mapFileJson[channel['id']] = channel['id']
+        with io.open(MapFile, 'w', encoding="utf-8") as MapFile:
+            MapFile.write(unicode(
+                json.dumps(mapFileJson, ensure_ascii=False, indent=4)))
 
 
 @route(PREFIX + '/getChannelInfo')
