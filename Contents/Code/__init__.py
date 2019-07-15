@@ -14,10 +14,13 @@ from lxml import etree as ET
 import re
 import pytz
 from datetime import datetime, timedelta
+import json
+import plistlib
 
 # Consts used
-VERSION = ' V0.0.0.14'
-NAME = 'epg-dk'
+VERSION = ' V0.0.1.00'
+APPNAME = 'epg-dk'
+NAME = APPNAME + VERSION
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
 ART = 'art-default.jpg'
 ICON = 'epg-dk.png'
@@ -47,8 +50,8 @@ def Start():
         NAME + '.bundle', 'debug')
     DEBUGMODE = os.path.isfile(debugFile)
     if DEBUGMODE:
-        print("********  Started %s on %s  ******** DEBUG MODE ******" % (
-            NAME + ' ' + VERSION, Platform.OS))
+        print("********  Started %s on %s at %s ******** DEBUG MODE ******" % (
+            NAME + ' ' + VERSION, Platform.OS, datetime.now()))
         Log.Debug("*******  Started %s on %s  ********* DEBUG MODE ******" % (
             NAME + VERSION, Platform.OS))
     else:
@@ -84,8 +87,42 @@ def MainMenu():
 
 @route(PREFIX + '/ValidatePrefs')
 def ValidatePrefs():
-    ''' ValidatePrefs '''
-    scheduler()
+    '''
+    Called by the framework every time a user changes the prefs
+    ''' 
+    Action =  Prefs['Action']    
+    if Action == 'Force Run':
+        # Start fetching the Channel List        
+        ResetToIdle()
+        doCreateXMLFile()
+    elif Action == 'Idle':        
+        return
+    elif Action == None:
+        return
+    else:
+        scheduler()
+
+@route(PREFIX + '/ResetToIdle')
+def ResetToIdle():
+    '''
+    Reset Library Prefs to idle
+    '''
+
+    pFile = Core.storage.join_path(
+        Core.app_support_path,
+        Core.config.bundles_dir_name,
+        APPNAME + '.bundle',
+        'Contents',
+        'Info.plist')
+    pl = plistlib.readPlist(pFile)
+    CFBundleIdentifier = pl['CFBundleIdentifier']
+    url = ''.join((
+        'http://127.0.0.1:32400',
+        '/:/plugins/',
+        CFBundleIdentifier,
+        '/prefs/set?Action=Idle'))
+    HTTP.Request(url, cacheTime=0, immediate=True)
+    return
 
 
 @route(PREFIX + '/createXMLFile')
@@ -289,7 +326,37 @@ def getChannelsList():
         # Only get "All"
         if Group['name'] == 'All':
             Channels = Group['channels']
+            makeMapFileAndCurrent(Channels)
             return Channels
+
+
+def makeMapFileAndCurrent(channels):
+    '''
+    Generates the Channels-Current file
+    Also generates the map file, if it doesn't exists
+    '''
+
+    ChannelsListFile = os.path.join(
+        os.path.dirname(Prefs['Store_Path']),
+        'Channels-Current.txt')
+    channelListJson = {}
+    for channel in channels:
+        channelListJson[channel['id']] = channel['name']
+    with io.open(ChannelsListFile, 'w', encoding="utf-8") as ChannelsList:
+        ChannelsList.write(unicode(
+            json.dumps(channelListJson, ensure_ascii=False, indent=4)))
+    # Make a Map file, if it doesn't already exists
+    # MapFile = os.path.join(
+    #     os.path.dirname(Prefs['Store_Path']),
+    #     'Map.txt')
+    # if not os.path.exists(MapFile):
+    #     # We need to create the default map file for our users
+    #     mapFileJson = {}
+    #     for channel in channels:
+    #         mapFileJson[channel['id']] = channel['id']
+    #     with io.open(MapFile, 'w', encoding="utf-8") as MapFile:
+    #         MapFile.write(unicode(
+    #             json.dumps(mapFileJson, ensure_ascii=False, indent=4)))
 
 
 @route(PREFIX + '/getChannelInfo')

@@ -1,5 +1,12 @@
 [
 	{
+		"id": "Action",
+		"type": "enum",
+		"label": "Action",
+		"values": ["Idle", "Force Run"],
+		"default": "Idle"
+	},
+	{
 		"id":"Store_Path",
 		"label":"Absolute path and filename of generated xmltv file",
 		"type":"text",
