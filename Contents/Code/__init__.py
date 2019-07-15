@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ###########################################################################
 # This plugin will downloads a danish program guide from YouSee
 #
@@ -240,8 +241,12 @@ def doCreateXMLFile(menuCall=False):
                         if ':' in Program['series_info']:
                             Episode, Total = Program['series_info'].split(':')
                         else:
-                            Episode = Program['series_info']
-                            Total = 1
+                            if subtitle and subtitle[:7] == 'Sæson: ':
+                                Episode = Program['series_info']
+                                Total = subtitle[7:]
+                            else:
+                                Episode = Program['series_info']
+                                Total = 1
                         Episode = str(int(Episode)-1)
                         Total = str(int(Total)-1)
                     else:
