@@ -1,3 +1,7 @@
+v0.0.1.00:
+	- Fixed #33 Plugin kan ikke længere lave en opsætning
+		- See Wiki for Instructions
+		
 v0.0.0.13:
     - pep8
     - Added channel id to display-name sub element.
