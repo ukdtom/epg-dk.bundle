@@ -18,7 +18,7 @@ import json
 import plistlib
 
 # Consts used
-VERSION = ' V0.0.1.00'
+VERSION = ' V0.0.1.01'
 APPNAME = 'epg-dk'
 NAME = APPNAME + VERSION
 DESCRIPTION = 'Download a program Guide from YouSee Denmark'
