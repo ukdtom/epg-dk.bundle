@@ -89,18 +89,19 @@ def MainMenu():
 def ValidatePrefs():
     '''
     Called by the framework every time a user changes the prefs
-    ''' 
-    Action =  Prefs['Action']    
+    '''
+    Action = Prefs['Action']
     if Action == 'Force Run':
-        # Start fetching the Channel List        
+        # Start fetching the Channel List
         ResetToIdle()
         doCreateXMLFile()
-    elif Action == 'Idle':        
+    elif Action == 'Idle':
         return
     elif Action == None:
         return
     else:
         scheduler()
+
 
 @route(PREFIX + '/ResetToIdle')
 def ResetToIdle():
@@ -251,8 +252,13 @@ def doCreateXMLFile(menuCall=False):
                         Total = str(int(Total)-1)
                     else:
                         # Episode Missing :-(
-                        Episode = '0'
-                        Total = '0'
+                        # We create a dummy season/episode based on date time
+                        Log.Debug('Start time will be used for season and episode: ' + startTime)
+                        # seStartTime = startTime.strftime("%Y%m%d")
+                        Total = startTime[:4]
+                        Episode = startTime[4:12]
+                        # Episode = '0'
+                        # Total = '0'
                         Log.Debug(''.join((
                             'Missing episode info for "%s"' % title,
                             ', so adding dummy info as %s:%s' % (
