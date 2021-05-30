@@ -1,3 +1,5 @@
+V0.0.1.01:
+	- Changed season/episode naming if missing from YouSee into S<YEAR>E<MonthDayTime>
 v0.0.1.00:
 	- Fixed #33 Plugin kan ikke længere lave en opsætning
 		- See Wiki for Instructions

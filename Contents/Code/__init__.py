@@ -250,24 +250,26 @@ def doCreateXMLFile(menuCall=False):
                                 Total = 1
                         Episode = str(int(Episode)-1)
                         Total = str(int(Total)-1)
+                        ET.SubElement(
+                            program,
+                            'episode-num',
+                            system='xmltv_ns').text = Total + '.' + Episode + '.'
                     else:
                         # Episode Missing :-(
                         # We create a dummy season/episode based on date time
-                        Log.Debug('Start time will be used for season and episode: ' + startTime)
                         # seStartTime = startTime.strftime("%Y%m%d")
                         Total = startTime[:4]
-                        Episode = startTime[4:12]
-                        # Episode = '0'
-                        # Total = '0'
+                        Total = str(int(Total)-1)
+                        Episode = str(int(startTime[4:12])-1)
                         Log.Debug(''.join((
                             'Missing episode info for "%s"' % title,
-                            ', so adding dummy info as %s:%s' % (
+                            ', so adding dummy info as %s.%s.' % (
                                 Total, Episode))
                         ))
-                    ET.SubElement(
-                        program,
-                        'episode-num',
-                        system='xmltv_ns').text = Total + '.' + Episode + '.'
+                        ET.SubElement(
+                            program,
+                            'episode-num',
+                            system='xmltv_ns').text = Total + '.' + Episode + '.'
             except Exception, e:
                 Log.Exception(
                     'Exception when digesting %s with the error %s' % (
